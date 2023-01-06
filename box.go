@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-var primTypes = [...]byte{0, 1, 2, 3, 4, 5}
+var primTypes = [...]byte{0, 1, 2, 3, 4}
 
 var (
 	boolType     = unsafe.Pointer(&primTypes[0])
@@ -57,7 +57,7 @@ func Uint64(x uint64) Value {
 
 // Float64 boxes a float64
 func Float64(f float64) Value {
-	return Value{uint64(math.Float64bits(f)), float64Type}
+	return Value{math.Float64bits(f), float64Type}
 }
 
 // CustomBits boxes a custom value.
@@ -414,6 +414,32 @@ func (v Value) toFloat64() float64 {
 	return math.NaN()
 }
 
+func ftou(f float64) uint64 {
+	if math.IsNaN(f) {
+		return 0
+	}
+	if math.IsInf(f, 0) {
+		if f > 0 {
+			return math.MaxUint64
+		}
+		return 0
+	}
+	return uint64(f)
+}
+
+func ftoi(f float64) int64 {
+	if math.IsNaN(f) {
+		return 0
+	}
+	if math.IsInf(f, 0) {
+		if f > 0 {
+			return math.MaxInt64
+		}
+		return math.MinInt64
+	}
+	return int64(f)
+}
+
 // Uint64 returns the value as a uint64
 func (v Value) Uint64() uint64 {
 	if v.ptr == uint64Type {
@@ -436,7 +462,7 @@ func (v Value) toUint64() uint64 {
 	case v.ptr == uint64Type:
 		return v.ext
 	case v.ptr == float64Type:
-		return uint64(math.Float64frombits(v.ext))
+		return ftou(math.Float64frombits(v.ext))
 	case v.ptr == custBitsType:
 		return v.ext
 	}
@@ -479,7 +505,7 @@ func (v Value) toInt64() int64 {
 	case v.ptr == uint64Type:
 		return int64(v.ext)
 	case v.ptr == float64Type:
-		return int64(math.Float64frombits(v.ext))
+		return ftoi(math.Float64frombits(v.ext))
 	case v.ptr == custBitsType:
 		return int64(v.ext)
 	}
