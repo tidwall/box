@@ -145,6 +145,7 @@ func (ts *taggedString) String() string {
 	return ts.str
 }
 
+// StringWithTag boxes a string value and adds a custom tag.
 func StringWithTag(s string, tag uint16) Value {
 	slen := uint64((*sface)(unsafe.Pointer(&s)).len)
 	if forceIfaceStrs || slen > maxLen {
@@ -551,8 +552,12 @@ func (v Value) IsString() bool {
 	case ptrBytes:
 		return false
 	}
-	_, ok := v.assertNonPrimAny().(string)
-	return ok
+	switch v.assertNonPrimAny().(type) {
+	case string, *taggedString:
+		return true
+	default:
+		return false
+	}
 }
 
 // IsBytes returns true if the boxed value is a []byte.
