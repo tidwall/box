@@ -271,6 +271,31 @@ func TestValue(t *testing.T) {
 
 }
 
+func TestBytes(t *testing.T) {
+	testBytes := func(t *testing.T, ncap int) {
+		t.Helper()
+		b := make([]byte, 0, ncap)
+		b = append(b, "hello world"...)
+		if ncap < cap(b) {
+			ncap = cap(b)
+		}
+		assert(len(b) == 11 && cap(b) == ncap)
+		v := Bytes(b)
+		b2 := v.Bytes()
+		assert(len(b2) == 11 && cap(b2) == ncap)
+	}
+
+	testBytes(t, 0)
+	testBytes(t, 1)
+	testBytes(t, 0xFF)
+	testBytes(t, 0xFFF)
+	testBytes(t, 0xFFFF)
+	testBytes(t, 0xFFFFF)
+	testBytes(t, 0x7FFFFF)
+	testBytes(t, 0x7FFFFF+1)
+	testBytes(t, 0xFFFFFF)
+}
+
 func TestUnits(t *testing.T) {
 	assert(Float64(-98).toFloat64() == -98)
 	assert(Uint64(98).toUint64() == 98)

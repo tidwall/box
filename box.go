@@ -163,8 +163,9 @@ func Bytes(b []byte) Value {
 	if forceIfaceStrs || blen > maxLen || bcap-blen > maxCap {
 		return toIface(b)
 	}
+
 	return Value{
-		ext: (blen << 32) | (bcap-blen)<<24 | ptrBytes,
+		ext: (blen << 32) | (bcap-blen)<<8 | ptrBytes,
 		ptr: (*bface)(unsafe.Pointer(&b)).ptr,
 	}
 }
@@ -237,10 +238,12 @@ func (v Value) assertString() string {
 }
 
 func (v Value) assertBytes() []byte {
+	blen := int(v.ext >> 32)
+	bcap := int((v.ext >> 8) & maxCap)
 	return *(*[]byte)(unsafe.Pointer(&bface{
 		ptr: unsafe.Pointer(v.ptr),
-		len: int(v.ext >> 32),
-		cap: int((v.ext << 32 >> 56) + (v.ext >> 32)),
+		len: blen,
+		cap: blen + bcap,
 	}))
 }
 
