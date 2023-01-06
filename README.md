@@ -55,17 +55,19 @@ Below are some benchmarks comparing `interface{}` to `box.Value`.
 - `Box*/from`: Convert a `box.Value` back to its original value.
 
 ```
-BenchmarkIfaceInt/to-10         128508648    8.632 ns/op    7 B/op   0 allocs/op
-BenchmarkIfaceInt/from-10      1000000000    0.652 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxInt/to-10          1000000000    1.152 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxInt/from-10        1000000000    0.640 ns/op    0 B/op   0 allocs/op
-BenchmarkIfaceString/to-10       58581472   17.120 ns/op   16 B/op   1 allocs/op
-BenchmarkIfaceString/from-10   1000000000    6.781 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxString/to-10        474026008    3.736 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxString/from-10      492863490    2.416 ns/op    0 B/op   0 allocs/op
-BenchmarkIfaceBytes/to-10        53937030   20.870 ns/op   24 B/op   1 allocs/op
-BenchmarkIfaceBytes/from-10    1000000000    5.353 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxBytes/to-10         438596022    6.365 ns/op    0 B/op   0 allocs/op
-BenchmarkBoxBytes/from-10       489872066    2.453 ns/op    0 B/op   0 allocs/op
+goos: darwin
+goarch: arm64
+pkg: github.com/tidwall/box
+BenchmarkIfaceInt/to-10        10000000    8.921 ns/op    7 B/op   0 allocs/op
+BenchmarkIfaceInt/from-10      10000000    0.6289 ns/op   0 B/op   0 allocs/op
+BenchmarkBoxInt/to-10          10000000    1.334 ns/op    0 B/op   0 allocs/op
+BenchmarkBoxInt/from-10        10000000    0.6823 ns/op   0 B/op   0 allocs/op
+BenchmarkIfaceString/to-10     10000000   18.17 ns/op    16 B/op   1 allocs/op
+BenchmarkIfaceString/from-10   10000000    0.8010 ns/op   0 B/op   0 allocs/op
+BenchmarkBoxString/to-10       10000000    3.705 ns/op    0 B/op   0 allocs/op
+BenchmarkBoxString/from-10     10000000    2.421 ns/op    0 B/op   0 allocs/op
+BenchmarkIfaceBytes/to-10      10000000   21.62 ns/op    24 B/op   1 allocs/op
+BenchmarkIfaceBytes/from-10    10000000    0.8104 ns/op   0 B/op   0 allocs/op
+BenchmarkBoxBytes/to-10        10000000    2.881 ns/op    0 B/op   0 allocs/op
+BenchmarkBoxBytes/from-10      10000000    2.366 ns/op    0 B/op   0 allocs/op
 ```
-

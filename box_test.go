@@ -464,7 +464,8 @@ func BenchmarkIfaceBytes(b *testing.B) {
 		b.ReportAllocs()
 		var n int
 		for i := 0; i < b.N; i++ {
-			n += len(arr[i].([]byte))
+			s := arr[i].([]byte)
+			n += int(s[0]) + int(s[len(s)-1])
 		}
 	})
 }
@@ -494,7 +495,8 @@ func BenchmarkBoxBytes(b *testing.B) {
 		b.ReportAllocs()
 		var n int
 		for i := 0; i < b.N; i++ {
-			n += len(arr[i].Bytes())
+			s := arr[i].Bytes()
+			n += int(s[0]) + int(s[len(s)-1])
 		}
 	})
 }
