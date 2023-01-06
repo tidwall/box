@@ -202,7 +202,11 @@ func TestValue(t *testing.T) {
 	assert(Any(123).IsString() == false)
 	assert(Any("hello").IsString() == true)
 	assert(Any([]byte("hello")).IsString() == false)
+	assert(StringWithTag("hello", 10).IsString() == true)
+	assert(StringWithTag("hello", 10).Tag() == 10)
 	forceIfaceStrs = true
+	assert(StringWithTag("hello", 10).IsString() == true)
+	assert(StringWithTag("hello", 10).Tag() == 10)
 	assert(Any("hello").IsString() == true)
 	assert(Any([]byte("hello")).IsString() == false)
 	forceIfaceStrs = false
