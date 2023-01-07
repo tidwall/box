@@ -2,6 +2,8 @@
 
 [![GoDoc](https://godoc.org/github.com/tidwall/box?status.svg)](https://godoc.org/github.com/tidwall/box)
 
+**experimental**
+
 Box is a Go package for wrapping value types.
 Works similar to an `interface{}` and is optimized for primitives, strings, and byte slices.
 
