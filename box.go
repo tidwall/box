@@ -7,9 +7,7 @@ package box
 import (
 	"fmt"
 	"math"
-	"runtime"
 	"strconv"
-	"sync/atomic"
 	"unsafe"
 )
 
@@ -65,29 +63,6 @@ func CustomBits(x uint64) Value {
 	return Value{x, custBitsType}
 }
 
-var plocker uint64
-var ptable map[unsafe.Pointer]struct{}
-
-func plock() {
-	for !atomic.CompareAndSwapUint64(&plocker, 0, 1) {
-		runtime.Gosched()
-	}
-}
-func punlock() {
-	atomic.StoreUint64(&plocker, 0)
-}
-
-func psave(p unsafe.Pointer) {
-	plock()
-	if _, ok := ptable[p]; !ok {
-		if ptable == nil {
-			ptable = make(map[unsafe.Pointer]struct{})
-		}
-		ptable[p] = struct{}{}
-	}
-	punlock()
-}
-
 type (
 	booler    interface{ Bool() bool }
 	int64er   interface{ Int64() int64 }
@@ -104,6 +79,11 @@ type bface struct {
 	ptr unsafe.Pointer
 	len int
 	cap int
+}
+
+type aface struct {
+	typ uintptr
+	ptr unsafe.Pointer
 }
 
 // maxLen is the maximum length for strings or byte-slices
@@ -172,13 +152,10 @@ func Bytes(b []byte) Value {
 }
 
 func toIface(v any) Value {
-	typ := (*[2]unsafe.Pointer)(unsafe.Pointer(&v))[0]
-	ptr := (*[2]unsafe.Pointer)(unsafe.Pointer(&v))[1]
-	if !forceIfacePtrs && uint64(uintptr(typ)) < uint64(1)<<56 {
+	a := *(*aface)(unsafe.Pointer(&v))
+	if !forceIfacePtrs && uint64(a.typ) < uint64(1)<<56 {
 		// The interface type pointer is small enough to fit into 56 bits.
-		// Save the type and tag the pointer
-		psave(typ)
-		return Value{(uint64(uintptr(typ)) << 8) | ptrIface, ptr}
+		return Value{(uint64(a.typ) << 8) | ptrIface, a.ptr}
 	}
 	// The interface type is a pointer in the heap or its pointer is too
 	// large to store in 56 bits.
@@ -253,10 +230,7 @@ func (v Value) assertIfacePtr() any {
 }
 
 func (v Value) assertIface() any {
-	return *(*any)(unsafe.Pointer(&[2]uintptr{
-		uintptr(v.ext >> 8),
-		uintptr(v.ptr),
-	}))
+	return *(*any)(unsafe.Pointer(&aface{uintptr(v.ext >> 8), v.ptr}))
 }
 
 // String returns the value as a string.
